@@ -36,9 +36,34 @@ $ terraform apply
 $ terraform import aws_organizations_account.my_org 111111111111
 ```
 
-## Best Practices
+## Appendix: Best Practices
 | # | Rule | Description |
 | - | ---- | ----------- | 
 | 1 | AWS Organizations In Use | Ensure Amazon Organizations is in use to consolidate all your AWS accounts into an organization. | 
 | 2 | Enable All Features | Ensure AWS Organizations All Features is enabled for fine-grained control over which services and actions the member accounts of an organization can access. | 
 | 3 | AWS Organizations Configuration Changes | AWS Organizations configuration changes have been detected within your Amazon Web Services account(s). | 
+
+## Appendix: Multi AWS Account Recommendations
+- Create Three (3) New Email aliases wknc-aws-org@, wknc-demo-stg@, wknc-demo-prd@ 
+
+| # | Description | Alias |
+| - | ----------- | ----- |
+| 1 | AWS Org/Root AWS Account                 | wknc-aws-org      |
+| 2 | Shared Services AWS Account              | wknc-aws-org      |
+| 3 | Log Archive AWS Account                  | wknc-aws-org      |
+| 4 | Security AWS Account                     | wknc-aws-org      |
+| 5 | Identity & Access AWS or AWS SSO Account | wknc-aws-org      |
+| 6 | Network/Direct Connect AWS Account       | wknc-aws-org      |
+| 7 | Staging AWS Account                      | wknc-demo-stg     |
+| 8 | Production AWS Account                   | wknc-demo-prd     |
+| 9 | Engineer Sandbox AWS Account             | wknc-engrname-sbx |
+
+## Appendix: Service Control Policies
+- Prevent Users from Disabling AWS CloudTrail
+- Prevent Users from Disabling Amazon CloudWatch or Altering Its Configuration
+- Prevent Users from Deleting Amazon VPC Flow Logs
+- Prevent Users from Disabling AWS Config or Changing Its Rules
+- Denies Access to AWS Based on the Requested Region
+- Require Encryption on Amazon S3 Buckets
+- Denies the modification of the account contacts & settings via the Billing Portal and My Account Page
+- Denies the account from leaving the organization
