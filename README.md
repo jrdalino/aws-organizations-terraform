@@ -36,7 +36,10 @@ $ terraform apply
 $ terraform import aws_organizations_account.my_org 111111111111
 ```
 
-## Step 4: move wknc-aws-org to Organizational Unit: "org"
+## Step 4: Move aws accounts to their respective OU's
+- wknc-aws-org > ou:"org"
+- wknc-demo-prd > ou:"prd"
+- wknc-demo-stg > ou:"stg"
 
 ## Appendix: Best Practices
 | # | Rule | Description |
