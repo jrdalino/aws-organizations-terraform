@@ -2,7 +2,7 @@
 
 ## Replace variables in terraform.tfvars
 
-## Initialize, Review Plan and Apply
+## Step 1: Create AWS Org, OU's & SCP's using Initialize, Review Plan and Apply
 ```
 $ terraform init
 $ terraform fmt
@@ -11,15 +11,10 @@ $ terraform plan
 $ terraform apply
 ```
 
-## Check your email to finish verifying your management account
+## Step 2: Check your email to finish verifying your management account
 - We sent a verification email to hello@example.com. After you verify your email address, you can invite existing AWS accounts to your organization. Learn more
 
-## Import an Existing AWS Account
-```
-$ terraform import aws_organizations_account.my_org 111111111111
-```
-
-## Create new AWS Accounts
+## Step 3.a Create new AWS Accounts using the console
 ### Production Account
 - Account name        = "wknc-demo-prd"
 - Email address       = "wknc-demo-prd@example.com"
@@ -28,13 +23,18 @@ $ terraform import aws_organizations_account.my_org 111111111111
 - Tag > Description   = "Demo production account"
 - Tag > Environment   = "prd"
 
-### Staging Accoung
+### Staging Account
 - Account name        = "wknc-demo-stg"
 - Email address       = "wknc-demo-stg@example.com"
 - IAM role name       = "OrganizationAccountAccessRole"
 - Tag > Name          = "wknc-demo-stg"
 - Tag > Description   = "Demo staging account"
 - Tag > Environment   = "stg"
+
+## Step 3.b: Import Existing AWS Accounts
+```
+$ terraform import aws_organizations_account.my_org 111111111111
+```
 
 ## Best Practices
 | # | Rule | Description |
