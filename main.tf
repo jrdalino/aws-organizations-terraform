@@ -1,14 +1,19 @@
 # AWS Organizations
 resource "aws_organizations_organization" "this" {
   aws_service_access_principals = [
-    "cloudtrail.amazonaws.com",
-    "config.amazonaws.com",
     // tag policies
+    // aws artifact
+    // aws backup
     // cloudformation stacksets
+    "cloudtrail.amazonaws.com",
     // compute optimizer
+    "config.amazonaws.com",
+    // directory service
     // firewall manager
+    // license manager
     // resource access manager
     // service catalog
+    "sso.amazonaws.com",
     // systems manager
   ]
 
