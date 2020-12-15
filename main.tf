@@ -1,8 +1,15 @@
-# AWS Organizations
+# AWS Organization
 resource "aws_organizations_organization" "this" {
   aws_service_access_principals = [
     "cloudtrail.amazonaws.com",
     "config.amazonaws.com",
+    // tag policies
+    // cloudformation stacksets
+    // compute optimizer
+    // firewall manager
+    // resource access manager
+    // service catalog
+    // systems manager
   ]
 
   enabled_policy_types = [
@@ -10,10 +17,13 @@ resource "aws_organizations_organization" "this" {
     "TAG_POLICY",
     "AISERVICES_OPT_OUT_POLICY",
   ]
+
   feature_set = "ALL"
 }
 
-resource "aws_organizations_organizational_unit" "this" {
+
+# Organizational Units
+resource "aws_organizations_organizational_unit" "org" {
   name      = "org"
   parent_id = aws_organizations_organization.this.roots[0].id
 }
@@ -30,12 +40,14 @@ resource "aws_organizations_organizational_unit" "stg" {
 
 # Service Control Policies
 resource "aws_organizations_policy" "DenySpecificAWSServices" {
-  name = "DenySpecificAWSServices"
+  name        = "DenySpecificAWSServices"
+  description = "Deny access to specific AWS Services"
+  type        = "SERVICE_CONTROL_POLICY"
 
   content = <<CONTENT
 {
     "Version": "2012-10-17",
-    "Id": "DenyWorkplaceServices",
+    "Id": "DenySpecificAWSServices",
     "Statement": [
         {
             "Sid": "DenyChime",
@@ -88,19 +100,38 @@ resource "aws_organizations_policy_attachment" "root_DenySpecificAWSServices" {
 
 # Tag Policies
 resource "aws_organizations_policy" "ProductDomainTag" {
-  name = "ProductDomainTag"
+  name        = "ProductDomainTag"
+  description = "Product Domain tag policy"
+  type        = "TAG_POLICY"
 
   content = <<CONTENT
 {
     "tags": {
-        "Environment": {
+        "ProductDomain": {
             "tag_key": {
-                "@@assign": "Environment"
+                "@@assign": "ProductDomain"
             },
             "tag_value": {
                 "@@assign": [
-                    "prd",
-                    "stg"
+                    "org",
+                    "adm",
+                    "sup",
+                    "cus",
+                    "pro",
+                    "inv",
+                    "car",
+                    "ord",
+                    "bil",
+                    "pay",
+                    "not",
+                    "rec",                    
+                    "sea",
+                    "pro",
+                    "sup",
+                    "rev",
+                    "ima",
+                    "cur",
+                    "adv" 
                 ]
             }
         }
@@ -119,8 +150,10 @@ resource "aws_organizations_policy_attachment" "root_ProductDomainTag" {
 }
 
 # AI Opt Out Policy
-resource "aws_organizations_policy" "AISERVICES_OPT_OUT_POLICY" {
-  name = "AISERVICES_OPT_OUT_POLICY"
+resource "aws_organizations_policy" "DefaultOptOutPolicy" {
+  name        = "DefaultOptOutPolicy"
+  description = "Prevent all AWS AI services from accessing our data"
+  type        = "AISERVICES_OPT_OUT_POLICY"
 
   content = <<CONTENT
 {
@@ -148,7 +181,7 @@ CONTENT
   ]
 }
 
-resource "aws_organizations_policy_attachment" "root_AISERVICES_OPT_OUT_POLICY" {
-  policy_id = aws_organizations_policy.AISERVICES_OPT_OUT_POLICY.id
+resource "aws_organizations_policy_attachment" "root_DefaultOptOutPolicy" {
+  policy_id = aws_organizations_policy.DefaultOptOutPolicy.id
   target_id = aws_organizations_organization.this.roots[0].id
 }
