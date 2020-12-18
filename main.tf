@@ -26,7 +26,6 @@ resource "aws_organizations_organization" "this" {
   feature_set = "ALL"
 }
 
-
 # Organizational Units
 resource "aws_organizations_organizational_unit" "org" {
   name      = "org"
@@ -41,66 +40,6 @@ resource "aws_organizations_organizational_unit" "prd" {
 resource "aws_organizations_organizational_unit" "stg" {
   name      = "stg"
   parent_id = aws_organizations_organization.this.roots[0].id
-}
-
-# Service Control Policies
-resource "aws_organizations_policy" "DenySpecificAWSServices" {
-  name        = "DenySpecificAWSServices"
-  description = "Deny access to specific AWS Services"
-  type        = "SERVICE_CONTROL_POLICY"
-
-  content = <<CONTENT
-{
-    "Version": "2012-10-17",
-    "Id": "DenySpecificAWSServices",
-    "Statement": [
-        {
-            "Sid": "DenyChime",
-            "Effect": "Deny",
-            "Action": "chime:*",
-            "Resource": "*"
-        },
-        {
-            "Sid": "DenyAlexa",
-            "Effect": "Deny",
-            "Action": "a4b:*",
-            "Resource": "*"
-        },
-        {
-            "Sid": "DenyAppStream",
-            "Effect": "Deny",
-            "Action": "appstream:*",
-            "Resource": "*"
-        },
-        {
-            "Sid": "DenyDirectoryService",
-            "Effect": "Deny",
-            "Action": "ds:*",
-            "Resource": "*"
-        },
-        {
-            "Sid": "DenyWorkServices",
-            "Effect": "Deny",
-            "Action": [
-                "workspaces:*",
-                "workmail:*",
-                "workdocs:*",
-                "wam:*"
-            ],
-            "Resource": "*"
-        }
-    ]
-}
-CONTENT
-
-  depends_on = [
-    aws_organizations_organization.this,
-  ]
-}
-
-resource "aws_organizations_policy_attachment" "root_DenySpecificAWSServices" {
-  policy_id = aws_organizations_policy.DenySpecificAWSServices.id
-  target_id = aws_organizations_organization.this.roots[0].id
 }
 
 # Tag Policies
@@ -188,5 +127,143 @@ CONTENT
 
 resource "aws_organizations_policy_attachment" "root_DefaultOptOutPolicy" {
   policy_id = aws_organizations_policy.DefaultOptOutPolicy.id
+  target_id = aws_organizations_organization.this.roots[0].id
+}
+
+# Service Control Policies
+resource "aws_organizations_policy" "DenySpecificAWSServices" {
+  name        = "DenySpecificAWSServices"
+  description = "Deny access to specific AWS Services"
+  type        = "SERVICE_CONTROL_POLICY"
+
+  content = <<CONTENT
+{
+    "Version": "2012-10-17",
+    "Id": "DenySpecificAWSServices",
+    "Statement": [
+        {
+            "Sid": "DenyChime",
+            "Effect": "Deny",
+            "Action": "chime:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "DenyAlexa",
+            "Effect": "Deny",
+            "Action": "a4b:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "DenyAppStream",
+            "Effect": "Deny",
+            "Action": "appstream:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "DenyDirectoryService",
+            "Effect": "Deny",
+            "Action": "ds:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "DenyWorkServices",
+            "Effect": "Deny",
+            "Action": [
+                "workspaces:*",
+                "workmail:*",
+                "workdocs:*",
+                "wam:*"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+CONTENT
+
+  depends_on = [
+    aws_organizations_organization.this,
+  ]
+}
+
+resource "aws_organizations_policy_attachment" "root_DenySpecificAWSServices" {
+  policy_id = aws_organizations_policy.DenySpecificAWSServices.id
+  target_id = aws_organizations_organization.this.roots[0].id
+}
+
+resource "aws_organizations_policy" "DenyAWSServicesInOtherRegions" {
+  name        = "DenyAWSServicesInOtherRegions"
+  description = "Deny access to AWS Services in other regions"
+  type        = "SERVICE_CONTROL_POLICY"
+
+  content = <<CONTENT
+{
+    "Version": "2012-10-17",
+    "Id": "DenyServicesInOtherRegions",
+    "Statement": [
+        {
+            "Sid": "DenyServicesInOtherRegions",
+            "Effect": "Deny",
+            "NotAction": [
+                "a4b:*",
+                "acm:*",
+                "aws-marketplace-management:*",
+                "aws-marketplace:*",
+                "aws-portal:*",
+                "awsbillingconsole:*",
+                "budgets:*",
+                "ce:*",
+                "chime:*",
+                "cloudfront:*",
+                "config:*",
+                "cur:*",
+                "directconnect:*",
+                "ec2:DescribeRegions",
+                "ec2:DescribeTransitGateways",
+                "ec2:DescribeVpnGateways",
+                "fms:*",
+                "globalaccelerator:*",
+                "health:*",
+                "iam:*",
+                "importexport:*",
+                "kms:*",
+                "mobileanalytics:*",
+                "networkmanager:*",
+                "organizations:*",
+                "pricing:*",
+                "route53:*",
+                "route53domains:*",
+                "s3:GetAccountPublic*",
+                "s3:ListAllMyBuckets",
+                "s3:PutAccountPublic*",
+                "shield:*",
+                "sts:*",
+                "support:*",
+                "trustedadvisor:*",
+                "waf-regional:*",
+                "waf:*",
+                "wafv2:*",
+                "wellarchitected:*"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringNotEquals": {
+                    "aws:RequestedRegion": [
+                        "us-east-1",
+                        "ap-southeast-1"
+                    ]
+                }
+            }
+        }
+    ]
+}
+CONTENT
+
+  depends_on = [
+    aws_organizations_organization.this,
+  ]
+}
+
+resource "aws_organizations_policy_attachment" "root_DenyAWSServicesInOtherRegions" {
+  policy_id = aws_organizations_policy.DenyAWSServicesInOtherRegions.id
   target_id = aws_organizations_organization.this.roots[0].id
 }
