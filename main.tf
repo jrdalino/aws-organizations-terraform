@@ -2,6 +2,7 @@
 resource "aws_organizations_organization" "this" {
   aws_service_access_principals = [
     // tag policies
+    "access-analyzer.amazonaws.com",
     // aws artifact
     // aws backup
     // cloudformation stacksets
